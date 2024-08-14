@@ -13,12 +13,15 @@ fn attrs_macro() {
 fn attrs_static() {
     let attrs = attrs! {
         class="text-red"
-        // flag=true
+        required=true
     };
 
     assert_eq!(
         Attrs::new(
-            Attributes::Static(&[("class", "text-red", ApplyAttributeAs::Attribute)]),
+            Attributes::Static(&[
+                ("required", "required", ApplyAttributeAs::Attribute),
+                ("class", "text-red", ApplyAttributeAs::Attribute),
+            ]),
             Listeners::None
         ),
         attrs
