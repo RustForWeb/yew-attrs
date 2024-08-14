@@ -1,0 +1,13 @@
+[package]
+name = "yew-attrs"
+description = "Dynamic attributes for Yew."
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+yew.workspace = true
+yew-attrs-macro = { path = "../yew-attrs-macro", version = "0.0.1" }

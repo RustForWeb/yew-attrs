@@ -1,0 +1,7 @@
+error: special prop "node_ref" is not allowed as attribute
+ --> tests/attrs_macro/special-node-ref-fail.rs:4:5
+  |
+4 |     attrs! { ref={NodeRef::default()} };
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the macro `attrs` (in Nightly builds, run with -Z macro-backtrace for more info)
