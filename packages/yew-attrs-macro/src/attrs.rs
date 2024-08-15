@@ -29,6 +29,7 @@ impl Parse for Attrs {
     }
 }
 
+// Based on `impl ToTokens for HtmlElement` (https://github.com/yewstack/yew/blob/yew-v0.21.0/packages/yew-macro/src/html_tree/html_element.rs).
 impl ToTokens for Attrs {
     #[allow(clippy::cognitive_complexity)]
     fn to_tokens(&self, tokens: &mut TokenStream) {
