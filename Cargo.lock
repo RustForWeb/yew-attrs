@@ -1457,7 +1457,7 @@ dependencies = [
 
 [[package]]
 name = "yew-attrs"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "yew",
  "yew-attrs-macro",
@@ -1465,7 +1465,7 @@ dependencies = [
 
 [[package]]
 name = "yew-attrs-macro"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "once_cell",
  "proc-macro-error",
