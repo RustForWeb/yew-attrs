@@ -4,7 +4,8 @@ use yew::{
     virtual_dom::{ApplyAttributeAs, Attributes, ListenerKind, Listeners},
     AttrValue,
 };
-use yew_attrs::{attrs, Attrs};
+use yew_attrs::Attrs;
+use yew_attrs_macro::attrs;
 
 #[test]
 fn attrs_macro() {

@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use yew_attrs::attrs;
+use yew_attrs_macro::attrs;
 
 fn compile_pass() {
     let id: Rc<str> = Rc::from("a");

@@ -1,5 +1,6 @@
 use yew::{prelude::*, virtual_dom::VTag, ServerRenderer};
-use yew_attrs::{attrs, Attrs};
+use yew_attrs::Attrs;
+use yew_attrs_macro::attrs;
 
 #[derive(PartialEq, Properties)]
 struct ButtonProps {

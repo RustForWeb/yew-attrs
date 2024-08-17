@@ -1,4 +1,4 @@
-use yew_attrs::attrs;
+use yew_attrs_macro::attrs;
 
 fn compile_pass() {
     let on_click = |_| {};
