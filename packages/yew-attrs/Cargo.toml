@@ -10,4 +10,4 @@ version.workspace = true
 
 [dependencies]
 yew.workspace = true
-yew-attrs-macro = { path = "../yew-attrs-macro", version = "0.1.0" }
+yew-attrs-macro = { path = "../yew-attrs-macro", version = "0.1.1" }
