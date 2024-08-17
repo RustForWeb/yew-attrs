@@ -18,23 +18,6 @@ pub struct HtmlDashedName {
 }
 
 impl HtmlDashedName {
-    /// Checks if this name is equal to the provided item (which can be anything implementing
-    /// `Into<String>`).
-    pub fn eq_ignore_ascii_case<S>(&self, other: S) -> bool
-    where
-        S: Into<String>,
-    {
-        let mut s = other.into();
-        s.make_ascii_lowercase();
-        s == self.to_ascii_lowercase_string()
-    }
-
-    pub fn to_ascii_lowercase_string(&self) -> String {
-        let mut s = self.to_string();
-        s.make_ascii_lowercase();
-        s
-    }
-
     pub fn to_lit_str(&self) -> LitStr {
         LitStr::new(&self.to_string(), self.span())
     }

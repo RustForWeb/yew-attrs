@@ -21,14 +21,6 @@ pub trait Stringify {
     /// Create `AttrValue` however possible.
     fn stringify(&self) -> TokenStream;
 
-    /// Optimize literals to `&'static str`, otherwise keep the value as is.
-    fn optimize_literals(&self) -> TokenStream
-    where
-        Self: ToTokens,
-    {
-        self.optimize_literals_tagged().to_token_stream()
-    }
-
     /// Like `optimize_literals` but tags static or dynamic strings with [Value]
     fn optimize_literals_tagged(&self) -> Value
     where

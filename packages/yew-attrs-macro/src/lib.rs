@@ -7,6 +7,7 @@ use syn::parse_macro_input;
 
 use crate::attrs::Attrs;
 
+/// Macro to generate dynamic attributes.
 #[proc_macro_error::proc_macro_error]
 #[proc_macro]
 pub fn attrs(input: TokenStream) -> TokenStream {

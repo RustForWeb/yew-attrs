@@ -3,15 +3,12 @@
 use std::convert::TryFrom;
 use std::ops::{Deref, DerefMut};
 
-use proc_macro2::{Spacing, Span, TokenStream, TokenTree};
-use quote::{quote, quote_spanned};
+use proc_macro2::{Spacing, TokenTree};
 use syn::parse::{Parse, ParseBuffer, ParseStream};
-use syn::spanned::Spanned;
 use syn::token::Brace;
 use syn::{braced, Block, Expr, ExprBlock, ExprMacro, ExprPath, ExprRange, Stmt, Token};
 
 use crate::yew_macro::html_tree::HtmlDashedName;
-use crate::yew_macro::stringify::Stringify;
 
 #[derive(Copy, Clone)]
 pub enum PropDirective {
@@ -281,12 +278,6 @@ impl PropList {
         Self(drained)
     }
 
-    /// Run the given function for all props and aggregate the errors.
-    /// If there's at least one error, the result will be `Result::Err`.
-    pub fn check_all(&self, f: impl FnMut(&Prop) -> syn::Result<()>) -> syn::Result<()> {
-        crate::yew_macro::join_errors(self.0.iter().map(f).filter_map(Result::err))
-    }
-
     /// Return an error for all duplicate props.
     pub fn check_no_duplicates(&self) -> syn::Result<()> {
         crate::yew_macro::join_errors(self.iter_duplicates().map(|prop| {
@@ -332,43 +323,6 @@ impl SpecialProps {
         let node_ref = props.pop_unique(Self::REF_LABEL)?;
         let key = props.pop_unique(Self::KEY_LABEL)?;
         Ok(Self { node_ref, key })
-    }
-
-    fn iter(&self) -> impl Iterator<Item = &Prop> {
-        self.node_ref.as_ref().into_iter().chain(self.key.as_ref())
-    }
-
-    /// Run the given function for all props and aggregate the errors.
-    /// If there's at least one error, the result will be `Result::Err`.
-    pub fn check_all(&self, f: impl FnMut(&Prop) -> syn::Result<()>) -> syn::Result<()> {
-        crate::yew_macro::join_errors(self.iter().map(f).filter_map(Result::err))
-    }
-
-    pub fn wrap_node_ref_attr(&self) -> TokenStream {
-        self.node_ref
-            .as_ref()
-            .map(|attr| {
-                let value = &attr.value;
-                quote_spanned! {value.span().resolved_at(Span::call_site())=>
-                    ::yew::html::IntoPropValue::<::yew::html::NodeRef>
-                    ::into_prop_value(#value)
-                }
-            })
-            .unwrap_or(quote! { ::std::default::Default::default() })
-    }
-
-    pub fn wrap_key_attr(&self) -> TokenStream {
-        self.key
-            .as_ref()
-            .map(|attr| {
-                let value = attr.value.optimize_literals();
-                quote_spanned! {value.span().resolved_at(Span::call_site())=>
-                    ::std::option::Option::Some(
-                        ::std::convert::Into::<::yew::virtual_dom::Key>::into(#value)
-                    )
-                }
-            })
-            .unwrap_or(quote! { ::std::option::Option::None })
     }
 }
 

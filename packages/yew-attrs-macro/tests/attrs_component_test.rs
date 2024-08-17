@@ -24,8 +24,10 @@ fn Button(props: &ButtonProps) -> Html {
 
 #[function_component]
 fn App() -> Html {
+    let on_click = |_| {};
+
     html! {
-        <Button attrs={attrs! {class="text-red" disabled=false}}>
+        <Button attrs={attrs! {class="text-red" disabled=false onclick={on_click}}}>
             {"Click"}
         </Button>
     }
