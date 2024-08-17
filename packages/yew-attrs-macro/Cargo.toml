@@ -20,5 +20,6 @@ syn = "2.0.74"
 
 [dev-dependencies]
 trybuild = "1.0.99"
-yew.workspace = true
+yew = { workspace = true, features = ["ssr"] }
 yew-attrs = { path = "../yew-attrs", version = "0.0.1" }
+tokio = { version = "1.39.2", features = ["full"] }

@@ -2,7 +2,7 @@ pub use yew_attrs_macro::attrs;
 
 use yew::virtual_dom::{Attributes, Listeners};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Default, PartialEq)]
 pub struct Attrs {
     pub attributes: Attributes,
     pub listeners: Listeners,
