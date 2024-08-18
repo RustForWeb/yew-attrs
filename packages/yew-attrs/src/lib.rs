@@ -43,7 +43,7 @@ pub use yew_attrs_macro::attrs;
 use yew::virtual_dom::{Attributes, Listeners};
 
 /// Container for dynamic attributes and listeners.
-#[derive(Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Attrs {
     /// Dynamic attributes.
     pub attributes: Attributes,
