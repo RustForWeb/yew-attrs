@@ -1460,12 +1460,12 @@ dependencies = [
 
 [[package]]
 name = "yew-attrs"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "indexmap",
  "thiserror",
  "yew",
- "yew-attrs-macro 0.2.1",
+ "yew-attrs-macro 0.2.2",
 ]
 
 [[package]]
@@ -1483,7 +1483,7 @@ dependencies = [
 
 [[package]]
 name = "yew-attrs-macro"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "indexmap",
  "once_cell",
