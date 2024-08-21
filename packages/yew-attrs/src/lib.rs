@@ -43,8 +43,8 @@ pub use yew_attrs_macro::attrs;
 use indexmap::IndexMap;
 use thiserror::Error;
 use yew::{
-    virtual_dom::{ApplyAttributeAs, Attributes, Listeners},
-    AttrValue,
+    virtual_dom::{ApplyAttributeAs, Attributes, Listeners, VTag},
+    AttrValue, Html, NodeRef,
 };
 
 /// Error for Attrs operations.
@@ -80,6 +80,58 @@ impl Attrs {
             merge_attributes(self.attributes, other.attributes)?,
             merge_listeners(self.listeners, other.listeners),
         ))
+    }
+
+    /// Create a new [`VTag`] using the attributes and listeners from this [`Attrs`].
+    pub fn new_vtag(self, tag: &str, node_ref: NodeRef, children: Html) -> VTag {
+        match tag {
+            "input" | "INPUT" => {
+                let (value, checked) = {
+                    if let Attributes::IndexMap(map) = &self.attributes {
+                        (
+                            map.get("value").map(|(v, _)| v),
+                            map.get("checked").map(|(v, _)| v),
+                        )
+                    } else {
+                        (None, None)
+                    }
+                };
+
+                VTag::__new_input(
+                    value.cloned(),
+                    checked.map(|_| true),
+                    node_ref,
+                    Default::default(),
+                    self.attributes,
+                    self.listeners,
+                )
+            }
+            "textarea" | "TEXTAREA" => {
+                let value = {
+                    if let Attributes::IndexMap(map) = &self.attributes {
+                        map.get("value").map(|(v, _)| v)
+                    } else {
+                        None
+                    }
+                };
+
+                VTag::__new_textarea(
+                    value.cloned(),
+                    node_ref,
+                    Default::default(),
+                    self.attributes,
+                    self.listeners,
+                )
+            }
+            tag => VTag::__new_other(
+                tag.to_string().into(),
+                node_ref.clone(),
+                Default::default(),
+                self.attributes,
+                self.listeners,
+                children,
+            ),
+        }
     }
 }
 
