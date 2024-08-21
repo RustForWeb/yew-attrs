@@ -17,13 +17,18 @@ fn Button(props: &ButtonProps) -> Html {
     props
         .attrs
         .clone()
-        .new_vtag("button", props.node_ref.clone(), props.children.clone())
+        .new_vtag(
+            "button",
+            props.node_ref.clone(),
+            Default::default(),
+            props.children.clone(),
+        )
         .into()
 }
 
 #[function_component]
 fn App() -> Html {
-    let on_click = |_| {};
+    let on_click = use_callback((), |_, _| {});
 
     html! {
         <Button attrs={attrs! {class="text-red" disabled=false onclick={on_click}}}>
