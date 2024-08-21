@@ -52,7 +52,7 @@ fn attrs_dynamic() {
     let id: Rc<str> = Rc::from("a");
     let class = "text-red";
     let required = true;
-    let prop = "test";
+    let prop = Some("test");
 
     let attrs = attrs! {
         id={id} class={class} required={required} ~prop={prop}
