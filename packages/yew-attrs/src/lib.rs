@@ -8,6 +8,8 @@
 //! #[derive(PartialEq, Properties)]
 //! struct ButtonProps {
 //!     #[prop_or_default]
+//!     pub node_ref: NodeRef,
+//!     #[prop_or_default]
 //!     pub attrs: Attrs,
 //!     #[prop_or_default]
 //!     pub children: Html,
@@ -15,15 +17,11 @@
 //!
 //! #[function_component]
 //! fn Button(props: &ButtonProps) -> Html {
-//!     VTag::__new_other(
-//!         "button".into(),
-//!         Default::default(),
-//!         Default::default(),
-//!         props.attrs.attributes.clone(),
-//!         props.attrs.listeners.clone(),
-//!         props.children.clone(),
-//!     )
-//!     .into()
+//!     props
+//!         .attrs
+//!         .clone()
+//!         .new_vtag("button", props.node_ref.clone(), Default::default(), props.children.clone())
+//!         .into()
 //! }
 //!
 //! #[function_component]
@@ -43,7 +41,7 @@ pub use yew_attrs_macro::attrs;
 use indexmap::IndexMap;
 use thiserror::Error;
 use yew::{
-    virtual_dom::{ApplyAttributeAs, Attributes, Listeners, VTag},
+    virtual_dom::{ApplyAttributeAs, Attributes, Key, Listeners, VTag},
     AttrValue, Html, NodeRef,
 };
 
@@ -83,7 +81,7 @@ impl Attrs {
     }
 
     /// Create a new [`VTag`] using the attributes and listeners from this [`Attrs`].
-    pub fn new_vtag(self, tag: &str, node_ref: NodeRef, children: Html) -> VTag {
+    pub fn new_vtag(self, tag: &str, node_ref: NodeRef, key: Option<Key>, children: Html) -> VTag {
         match tag {
             "input" | "INPUT" => {
                 let (value, checked) = {
@@ -101,7 +99,7 @@ impl Attrs {
                     value.cloned(),
                     checked.map(|_| true),
                     node_ref,
-                    Default::default(),
+                    key,
                     self.attributes,
                     self.listeners,
                 )
@@ -118,7 +116,7 @@ impl Attrs {
                 VTag::__new_textarea(
                     value.cloned(),
                     node_ref,
-                    Default::default(),
+                    key,
                     self.attributes,
                     self.listeners,
                 )
@@ -126,7 +124,7 @@ impl Attrs {
             tag => VTag::__new_other(
                 tag.to_string().into(),
                 node_ref.clone(),
-                Default::default(),
+                key,
                 self.attributes,
                 self.listeners,
                 children,
