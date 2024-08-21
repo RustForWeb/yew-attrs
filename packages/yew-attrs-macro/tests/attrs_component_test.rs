@@ -1,9 +1,11 @@
-use yew::{prelude::*, virtual_dom::VTag, ServerRenderer};
+use yew::{prelude::*, ServerRenderer};
 use yew_attrs::Attrs;
 use yew_attrs_macro::attrs;
 
 #[derive(PartialEq, Properties)]
 struct ButtonProps {
+    #[prop_or_default]
+    pub node_ref: NodeRef,
     #[prop_or_default]
     pub attrs: Attrs,
     #[prop_or_default]
@@ -12,15 +14,11 @@ struct ButtonProps {
 
 #[function_component]
 fn Button(props: &ButtonProps) -> Html {
-    VTag::__new_other(
-        "button".into(),
-        Default::default(),
-        Default::default(),
-        props.attrs.attributes.clone(),
-        props.attrs.listeners.clone(),
-        props.children.clone(),
-    )
-    .into()
+    props
+        .attrs
+        .clone()
+        .new_vtag("button", props.node_ref.clone(), props.children.clone())
+        .into()
 }
 
 #[function_component]
