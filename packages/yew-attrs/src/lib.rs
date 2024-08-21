@@ -55,7 +55,7 @@ pub enum AttrsError {
 }
 
 /// Container for dynamic attributes and listeners.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Attrs {
     /// Dynamic attributes.
     pub attributes: Attributes,
@@ -80,6 +80,15 @@ impl Attrs {
             merge_attributes(self.attributes, other.attributes)?,
             merge_listeners(self.listeners, other.listeners),
         ))
+    }
+}
+
+impl Default for Attrs {
+    fn default() -> Self {
+        Self {
+            attributes: Attributes::IndexMap(IndexMap::default()),
+            listeners: Listeners::default(),
+        }
     }
 }
 
