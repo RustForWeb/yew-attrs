@@ -1449,6 +1449,8 @@ dependencies = [
 [[package]]
 name = "yew-attrs"
 version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f4e74697b671fa9727e012b29d1b26f5e48add33f29ccc06a258f95768a45b93"
 dependencies = [
  "indexmap",
  "thiserror",
@@ -1458,30 +1460,12 @@ dependencies = [
 
 [[package]]
 name = "yew-attrs"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4e74697b671fa9727e012b29d1b26f5e48add33f29ccc06a258f95768a45b93"
+version = "0.2.1"
 dependencies = [
  "indexmap",
  "thiserror",
  "yew",
- "yew-attrs-macro 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "yew-attrs-macro"
-version = "0.2.0"
-dependencies = [
- "indexmap",
- "once_cell",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn 2.0.74",
- "tokio",
- "trybuild",
- "yew",
- "yew-attrs 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "yew-attrs-macro 0.2.1",
 ]
 
 [[package]]
@@ -1495,6 +1479,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.74",
+]
+
+[[package]]
+name = "yew-attrs-macro"
+version = "0.2.1"
+dependencies = [
+ "indexmap",
+ "once_cell",
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.74",
+ "tokio",
+ "trybuild",
+ "yew",
+ "yew-attrs 0.2.0",
 ]
 
 [[package]]
