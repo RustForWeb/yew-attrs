@@ -162,41 +162,23 @@ impl ToTokens for Attrs {
                 }
             }
 
-            /// Try to turn attribute list into a `::yew::virtual_dom::Attributes::Static`
-            fn try_into_static(
-                src: &[(LitStr, Value, Option<PropDirective>)],
-            ) -> Option<TokenStream> {
-                let mut kv = Vec::with_capacity(src.len());
-                for (k, v, directive) in src.iter() {
-                    let v = match v {
-                        Value::Static(v) => quote! { #v },
-                        Value::Dynamic(_) => return None,
-                    };
-                    let apply_as = apply_as(directive.as_ref());
-                    kv.push(quote! { ( #k, #v, #apply_as ) });
-                }
-
-                Some(quote! { ::yew::virtual_dom::Attributes::Static(&[#(#kv),*]) })
-            }
-
             let attrs = normal_attrs
                 .chain(boolean_attrs)
                 .chain(class_attr)
                 .collect::<Vec<(LitStr, Value, Option<PropDirective>)>>();
-            try_into_static(&attrs).unwrap_or_else(|| {
-                let keys = attrs.iter().map(|(k, ..)| quote! { #k });
-                let values = attrs.iter().map(|(_, v, directive)| {
-                    let apply_as = apply_as(directive.as_ref());
-                    let value = wrap_attr_value(v);
-                    quote! { ::std::option::Option::map(#value, |it| (it, #apply_as)) }
-                });
-                quote! {
-                    ::yew::virtual_dom::Attributes::Dynamic{
-                        keys: &[#(#keys),*],
-                        values: ::std::boxed::Box::new([#(#values),*]),
-                    }
-                }
-            })
+
+            let values = attrs.iter().map(|(key, value, directive)| {
+                let value = wrap_attr_value(value);
+                let apply_as = apply_as(directive.as_ref());
+
+                quote! { (::yew::AttrValue::from(#key), (#value.unwrap(), #apply_as)) }
+            });
+
+            quote! {
+                ::yew::virtual_dom::Attributes::IndexMap([
+                    #(#values),*
+                ].into())
+            }
         };
 
         let listeners = if listeners.is_empty() {

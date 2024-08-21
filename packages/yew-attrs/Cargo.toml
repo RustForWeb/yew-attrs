@@ -9,5 +9,7 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
+indexmap = "2.4.0"
+thiserror = "1.0.63"
 yew.workspace = true
 yew-attrs-macro = { path = "../yew-attrs-macro", version = "0.1.2" }

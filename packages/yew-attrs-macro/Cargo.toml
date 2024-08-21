@@ -19,7 +19,8 @@ quote = "1.0.36"
 syn = { version = "2.0.74", features = ["full", "extra-traits"] }
 
 [dev-dependencies]
+indexmap = "2.4.0"
+tokio = { version = "1.39.2", features = ["full"] }
 trybuild = "1.0.99"
 yew = { workspace = true, features = ["ssr"] }
 yew-attrs = { version = "0.1.0" }
-tokio = { version = "1.39.2", features = ["full"] }

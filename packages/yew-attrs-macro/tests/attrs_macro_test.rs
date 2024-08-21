@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use indexmap::IndexMap;
 use yew::{
     virtual_dom::{ApplyAttributeAs, Attributes, ListenerKind, Listeners},
     AttrValue,
@@ -21,16 +22,25 @@ fn attrs_static() {
         class="text-red"
         required=true
         hidden=false
-        ~value="test"
+        ~prop="test"
     };
 
     assert_eq!(
         Attrs::new(
-            Attributes::Static(&[
-                ("value", "test", ApplyAttributeAs::Property),
-                ("required", "required", ApplyAttributeAs::Attribute),
-                ("class", "text-red", ApplyAttributeAs::Attribute),
-            ]),
+            Attributes::IndexMap(IndexMap::from([
+                (
+                    AttrValue::Static("prop"),
+                    (AttrValue::Static("test"), ApplyAttributeAs::Property)
+                ),
+                (
+                    AttrValue::Static("required"),
+                    (AttrValue::Static("required"), ApplyAttributeAs::Attribute)
+                ),
+                (
+                    AttrValue::Static("class"),
+                    (AttrValue::Static("text-red"), ApplyAttributeAs::Attribute)
+                ),
+            ])),
             Listeners::None
         ),
         attrs
@@ -41,24 +51,33 @@ fn attrs_static() {
 fn attrs_dynamic() {
     let id: Rc<str> = Rc::from("a");
     let class = "text-red";
-    let value = "test";
     let required = true;
+    let prop = "test";
 
     let attrs = attrs! {
-        id={id} class={class} ~value={value} required={required}
+        id={id} class={class} required={required} ~prop={prop}
     };
 
     assert_eq!(
         Attrs::new(
-            Attributes::Dynamic {
-                keys: &["id", "value", "required", "class"],
-                values: Box::new([
-                    Some((AttrValue::Rc(Rc::from("a")), ApplyAttributeAs::Attribute)),
-                    Some((AttrValue::Static("test"), ApplyAttributeAs::Property)),
-                    Some((AttrValue::Static("required"), ApplyAttributeAs::Attribute)),
-                    Some((AttrValue::Static("text-red"), ApplyAttributeAs::Attribute)),
-                ])
-            },
+            Attributes::IndexMap(IndexMap::from([
+                (
+                    AttrValue::Static("id"),
+                    (AttrValue::Rc(Rc::from("a")), ApplyAttributeAs::Attribute)
+                ),
+                (
+                    AttrValue::Static("prop"),
+                    (AttrValue::Static("test"), ApplyAttributeAs::Property)
+                ),
+                (
+                    AttrValue::Static("required"),
+                    (AttrValue::Static("required"), ApplyAttributeAs::Attribute)
+                ),
+                (
+                    AttrValue::Static("class"),
+                    (AttrValue::Static("text-red"), ApplyAttributeAs::Attribute)
+                ),
+            ])),
             Listeners::None
         ),
         attrs
@@ -71,7 +90,10 @@ fn attrs_class_empty() {
         class=""
     };
 
-    assert_eq!(Attrs::new(Attributes::default(), Listeners::None), attrs);
+    assert_eq!(
+        Attrs::new(Attributes::IndexMap(IndexMap::default()), Listeners::None),
+        attrs
+    );
 }
 
 #[allow(deprecated)]
@@ -83,13 +105,10 @@ fn attrs_class_tuple_deprecated() {
 
     assert_eq!(
         Attrs::new(
-            Attributes::Dynamic {
-                keys: &["class"],
-                values: Box::new([Some((
-                    AttrValue::Static("text-red"),
-                    ApplyAttributeAs::Attribute
-                )),])
-            },
+            Attributes::IndexMap(IndexMap::from([(
+                AttrValue::Static("class"),
+                (AttrValue::Static("text-red"), ApplyAttributeAs::Attribute)
+            )])),
             Listeners::None
         ),
         attrs

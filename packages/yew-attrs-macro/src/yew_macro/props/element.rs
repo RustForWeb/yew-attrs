@@ -26,8 +26,6 @@ pub struct ElementProps {
     pub listeners: Vec<Prop>,
     pub classes: Option<ClassesForm>,
     pub booleans: Vec<Prop>,
-    // pub value: Option<Prop>,
-    // pub checked: Option<Prop>,
     pub special: SpecialProps,
 }
 
@@ -47,17 +45,13 @@ impl Parse for ElementProps {
         let classes = props
             .pop("class")
             .map(|prop| ClassesForm::from_expr(prop.value));
-        // let value = props.pop("value");
-        // let checked = props.pop("checked");
         let special = props.special;
 
         Ok(Self {
             attributes: props.prop_list.into_vec(),
             classes,
             listeners: listeners.into_vec(),
-            // checked,
             booleans: booleans.into_vec(),
-            // value,
             special,
         })
     }
@@ -68,11 +62,11 @@ static BOOLEAN_SET: Lazy<HashSet<&'static str>> = Lazy::new(|| {
         // Living Standard
         // From: https://html.spec.whatwg.org/#attributes-3
         // where `Value` = Boolean attribute
-        // Note: `checked` is uniquely handled in the html! macro.
         "allowfullscreen",
         "async",
         "autofocus",
         "autoplay",
+        "checked",
         "controls",
         "default",
         "defer",
