@@ -4,7 +4,7 @@ use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
 use syn::{Expr, Lit, LitStr};
 
-use crate::yew_macro::props::{ClassesForm, ElementProps, Prop, PropDirective};
+use crate::yew_macro::props::{ElementProps, Prop, PropDirective};
 use crate::yew_macro::stringify::{Stringify, Value};
 
 pub struct Attrs(ElementProps);
@@ -29,7 +29,7 @@ impl Parse for Attrs {
     }
 }
 
-// Based on `impl ToTokens for HtmlElement` (https://github.com/yewstack/yew/blob/yew-v0.21.0/packages/yew-macro/src/html_tree/html_element.rs).
+// Based on `impl ToTokens for HtmlElement` (https://github.com/yewstack/yew/blob/15ac51c399c27b6932357037fce32ddb24f24531/packages/yew-macro/src/html_tree/html_element.rs).
 impl ToTokens for Attrs {
     #[allow(clippy::cognitive_complexity)]
     fn to_tokens(&self, tokens: &mut TokenStream) {
@@ -39,9 +39,27 @@ impl ToTokens for Attrs {
             classes,
             attributes,
             booleans,
+            value,
+            checked,
             listeners,
             ..
         } = &props;
+
+        // attributes with special treatment
+
+        let value = value
+            .as_ref()
+            .map(|prop| wrap_attr_value(prop.value.optimize_literals()))
+            .unwrap_or(quote! { ::std::option::Option::None });
+        let checked = checked
+            .as_ref()
+            .map(|attr| {
+                let value = &attr.value;
+                quote! { ::std::option::Option::Some( #value ) }
+            })
+            .unwrap_or(quote! { ::std::option::Option::None });
+
+        // other attributes
 
         let attributes = {
             let normal_attrs = attributes.iter().map(
@@ -96,39 +114,11 @@ impl ToTokens for Attrs {
                     ))
                 },
             );
-            let class_attr = classes.as_ref().and_then(|classes| match classes {
-                ClassesForm::Tuple(classes) => {
-                    let span = classes.span();
-                    let classes: Vec<_> = classes.elems.iter().collect();
-                    let n = classes.len();
 
-                    let deprecation_warning = quote_spanned! {span=>
-                        #[deprecated(
-                            note = "the use of `(...)` with the attribute `class` is deprecated and will be removed in version 0.19. Use the `classes!` macro instead."
-                        )]
-                        fn deprecated_use_of_class() {}
-
-                        if false {
-                            deprecated_use_of_class();
-                        };
-                    };
-
-                    Some((
-                        LitStr::new("class", span),
-                        Value::Dynamic(quote! {
-                            {
-                                #deprecation_warning
-
-                                let mut __yew_classes = ::yew::html::Classes::with_capacity(#n);
-                                #(__yew_classes.push(#classes);)*
-                                __yew_classes
-                            }
-                        }),
-                        None,
-                    ))
-                }
-                ClassesForm::Single(classes) => {
-                    match classes.try_into_lit() {
+            let class_attr =
+                classes
+                    .as_ref()
+                    .and_then(|classes| match classes.value.try_into_lit() {
                         Some(lit) => {
                             if lit.value().is_empty() {
                                 None
@@ -141,43 +131,48 @@ impl ToTokens for Attrs {
                             }
                         }
                         None => {
+                            let expr = &classes.value;
                             Some((
-                                LitStr::new("class", classes.span()),
+                                LitStr::new("class", classes.label.span()),
                                 Value::Dynamic(quote! {
-                                    ::std::convert::Into::<::yew::html::Classes>::into(#classes)
+                                    ::std::convert::Into::<::yew::html::Classes>::into(#expr)
                                 }),
                                 None,
                             ))
                         }
-                    }
-                }
-            });
-
-            fn apply_as(directive: Option<&PropDirective>) -> TokenStream {
-                match directive {
-                    Some(PropDirective::ApplyAsProperty(token)) => {
-                        quote_spanned!(token.span()=> ::yew::virtual_dom::ApplyAttributeAs::Property)
-                    }
-                    None => quote!(::yew::virtual_dom::ApplyAttributeAs::Attribute),
-                }
-            }
+                    });
 
             let attrs = normal_attrs
                 .chain(boolean_attrs)
                 .chain(class_attr)
                 .collect::<Vec<(LitStr, Value, Option<PropDirective>)>>();
 
-            let values = attrs.iter().map(|(key, value, directive)| {
-                let value = wrap_attr_value(value);
-                let apply_as = apply_as(directive.as_ref());
-
-                quote! { (::yew::AttrValue::from(#key), (#value.unwrap(), #apply_as)) }
+            let keys = attrs.iter().map(|(k, ..)| quote! { #k });
+            let values = attrs.iter().map(|(_, v, directive)| {
+                let value = match directive {
+                    Some(PropDirective::ApplyAsProperty(token)) => {
+                        quote_spanned!(token.span()=> ::std::option::Option::Some(
+                            ::yew::virtual_dom::AttributeOrProperty::Property(
+                                ::std::convert::Into::into(#v)
+                            ))
+                        )
+                    }
+                    None => {
+                        let value = wrap_attr_value(v);
+                        quote! {
+                            ::std::option::Option::map(#value, ::yew::virtual_dom::AttributeOrProperty::Attribute)
+                        }
+                    },
+                };
+                quote! { #value }
             });
 
             quote! {
-                ::yew::virtual_dom::Attributes::IndexMap([
-                    #(#values),*
-                ].into())
+                ::yew::virtual_dom::Attributes::IndexMap(
+                    ::std::rc::Rc::new([
+                        #((::implicit_clone::unsync::IString::from(#keys), #values.unwrap())),*
+                    ].into())
+                )
             }
         };
 
@@ -201,6 +196,8 @@ impl ToTokens for Attrs {
         tokens.extend(quote! {
             ::yew_attrs::Attrs::new(
                 #attributes,
+                #value,
+                #checked,
                 #listeners,
             )
         });

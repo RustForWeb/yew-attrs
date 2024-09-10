@@ -11,3 +11,6 @@ version = "0.2.4"
 
 [workspace.dependencies]
 yew = "0.21.0"
+
+[patch.crates-io]
+yew = { git = "https://github.com/RustForWeb/yew.git", branch = "feature/set-noderef" }

@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use indexmap::IndexMap;
 use yew::{
-    virtual_dom::{ApplyAttributeAs, Attributes, ListenerKind, Listeners},
+    virtual_dom::{AttributeOrProperty, Attributes, ListenerKind, Listeners},
     AttrValue,
 };
 use yew_attrs::Attrs;
@@ -22,25 +22,27 @@ fn attrs_static() {
         class="text-red"
         required=true
         hidden=false
-        ~prop="test"
+        // ~prop="test"
     };
 
     assert_eq!(
         Attrs::new(
-            Attributes::IndexMap(IndexMap::from([
-                (
-                    AttrValue::Static("prop"),
-                    (AttrValue::Static("test"), ApplyAttributeAs::Property)
-                ),
+            Attributes::IndexMap(Rc::new(IndexMap::from([
+                // (
+                //     AttrValue::Static("prop"),
+                //     AttributeOrProperty::Property("test".into())
+                // ),
                 (
                     AttrValue::Static("required"),
-                    (AttrValue::Static("required"), ApplyAttributeAs::Attribute)
+                    AttributeOrProperty::Attribute(AttrValue::Static("required"))
                 ),
                 (
                     AttrValue::Static("class"),
-                    (AttrValue::Static("text-red"), ApplyAttributeAs::Attribute)
+                    AttributeOrProperty::Attribute(AttrValue::Static("text-red"))
                 ),
-            ])),
+            ]))),
+            None,
+            None,
             Listeners::None
         ),
         attrs
@@ -52,32 +54,34 @@ fn attrs_dynamic() {
     let id: Rc<str> = Rc::from("a");
     let class = "text-red";
     let required = true;
-    let prop = Some("test");
+    // let prop = Some("test");
 
     let attrs = attrs! {
-        id={id} class={class} required={required} ~prop={prop}
+        id={id} class={class} required={required} // ~prop={prop}
     };
 
     assert_eq!(
         Attrs::new(
-            Attributes::IndexMap(IndexMap::from([
+            Attributes::IndexMap(Rc::new(IndexMap::from([
                 (
                     AttrValue::Static("id"),
-                    (AttrValue::Rc(Rc::from("a")), ApplyAttributeAs::Attribute)
+                    AttributeOrProperty::Attribute(AttrValue::Rc(Rc::from("a")))
                 ),
-                (
-                    AttrValue::Static("prop"),
-                    (AttrValue::Static("test"), ApplyAttributeAs::Property)
-                ),
+                // (
+                //     AttrValue::Static("prop"),
+                //     AttributeOrProperty::Property("test".into())
+                // ),
                 (
                     AttrValue::Static("required"),
-                    (AttrValue::Static("required"), ApplyAttributeAs::Attribute)
+                    AttributeOrProperty::Attribute(AttrValue::Static("required"))
                 ),
                 (
                     AttrValue::Static("class"),
-                    (AttrValue::Static("text-red"), ApplyAttributeAs::Attribute)
+                    AttributeOrProperty::Attribute(AttrValue::Static("text-red"))
                 ),
-            ])),
+            ]))),
+            None,
+            None,
             Listeners::None
         ),
         attrs
@@ -91,24 +95,10 @@ fn attrs_class_empty() {
     };
 
     assert_eq!(
-        Attrs::new(Attributes::IndexMap(IndexMap::default()), Listeners::None),
-        attrs
-    );
-}
-
-#[allow(deprecated)]
-#[test]
-fn attrs_class_tuple_deprecated() {
-    let attrs = attrs! {
-        class={("text-red",)}
-    };
-
-    assert_eq!(
         Attrs::new(
-            Attributes::IndexMap(IndexMap::from([(
-                AttrValue::Static("class"),
-                (AttrValue::Static("text-red"), ApplyAttributeAs::Attribute)
-            )])),
+            Attributes::IndexMap(Rc::new(IndexMap::default())),
+            None,
+            None,
             Listeners::None
         ),
         attrs

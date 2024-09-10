@@ -1,4 +1,4 @@
-// Copied from https://github.com/yewstack/yew/blob/yew-v0.21.0/packages/yew-macro/src/stringify.rs.
+// Copied from https://github.com/yewstack/yew/blob15ac51c399c27b6932357037fce32ddb24f24531/packages/yew-macro/src/stringify.rs.
 
 use proc_macro2::{Span, TokenStream};
 use quote::{quote_spanned, ToTokens};
@@ -20,6 +20,14 @@ pub trait Stringify {
     fn try_into_lit(&self) -> Option<LitStr>;
     /// Create `AttrValue` however possible.
     fn stringify(&self) -> TokenStream;
+
+    /// Optimize literals to `&'static str`, otherwise keep the value as is.
+    fn optimize_literals(&self) -> TokenStream
+    where
+        Self: ToTokens,
+    {
+        self.optimize_literals_tagged().to_token_stream()
+    }
 
     /// Like `optimize_literals` but tags static or dynamic strings with [Value]
     fn optimize_literals_tagged(&self) -> Value

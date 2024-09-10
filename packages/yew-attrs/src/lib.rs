@@ -41,12 +41,14 @@
 //! }
 //! ```
 
+use std::rc::Rc;
+
 pub use yew_attrs_macro::attrs;
 
 use indexmap::IndexMap;
 use thiserror::Error;
 use yew::{
-    virtual_dom::{ApplyAttributeAs, Attributes, Key, Listeners, VTag},
+    virtual_dom::{AttributeOrProperty, Attributes, Key, Listeners, VTag},
     AttrValue, Html, NodeRef,
 };
 
@@ -62,15 +64,26 @@ pub enum AttrsError {
 pub struct Attrs {
     /// Dynamic attributes.
     pub attributes: Attributes,
+    /// Dynamic value attribute (special treatment).
+    pub value: Option<AttrValue>,
+    /// Dynamic checked attribute (special treatment).
+    pub checked: Option<bool>,
     /// Dynamic listeners.
     pub listeners: Listeners,
 }
 
 impl Attrs {
     /// Create a new [`Attrs`].
-    pub fn new(attributes: Attributes, listeners: Listeners) -> Self {
+    pub fn new(
+        attributes: Attributes,
+        value: Option<AttrValue>,
+        checked: Option<bool>,
+        listeners: Listeners,
+    ) -> Self {
         Self {
             attributes,
+            value,
+            checked,
             listeners,
         }
     }
@@ -81,6 +94,8 @@ impl Attrs {
     pub fn merge(self, other: Attrs) -> Result<Attrs, AttrsError> {
         Ok(Attrs::new(
             merge_attributes(self.attributes, other.attributes)?,
+            other.value.or(self.value),
+            other.checked.or(self.checked),
             merge_listeners(self.listeners, other.listeners),
         ))
     }
@@ -88,43 +103,16 @@ impl Attrs {
     /// Create a new [`VTag`] using the attributes and listeners from this [`Attrs`].
     pub fn new_vtag(self, tag: &str, node_ref: NodeRef, key: Option<Key>, children: Html) -> VTag {
         match tag {
-            "input" | "INPUT" => {
-                let (value, checked) = {
-                    if let Attributes::IndexMap(map) = &self.attributes {
-                        (
-                            map.get("value").map(|(v, _)| v),
-                            map.get("checked").map(|(v, _)| v),
-                        )
-                    } else {
-                        (None, None)
-                    }
-                };
-
-                VTag::__new_input(
-                    value.cloned(),
-                    checked.map(|_| true),
-                    node_ref,
-                    key,
-                    self.attributes,
-                    self.listeners,
-                )
-            }
+            "input" | "INPUT" => VTag::__new_input(
+                self.value,
+                self.checked,
+                node_ref,
+                key,
+                self.attributes,
+                self.listeners,
+            ),
             "textarea" | "TEXTAREA" => {
-                let value = {
-                    if let Attributes::IndexMap(map) = &self.attributes {
-                        map.get("value").map(|(v, _)| v)
-                    } else {
-                        None
-                    }
-                };
-
-                VTag::__new_textarea(
-                    value.cloned(),
-                    node_ref,
-                    key,
-                    self.attributes,
-                    self.listeners,
-                )
+                VTag::__new_textarea(self.value, node_ref, key, self.attributes, self.listeners)
             }
             tag => VTag::__new_other(
                 tag.to_string().into(),
@@ -141,7 +129,9 @@ impl Attrs {
 impl Default for Attrs {
     fn default() -> Self {
         Self {
-            attributes: Attributes::IndexMap(IndexMap::default()),
+            attributes: Attributes::IndexMap(Rc::new(IndexMap::default())),
+            value: Default::default(),
+            checked: Default::default(),
             listeners: Listeners::default(),
         }
     }
@@ -157,14 +147,14 @@ fn merge_attributes(a: Attributes, b: Attributes) -> Result<Attributes, AttrsErr
 }
 
 fn merge_index_map_attributes(
-    a: IndexMap<AttrValue, (AttrValue, ApplyAttributeAs)>,
-    b: IndexMap<AttrValue, (AttrValue, ApplyAttributeAs)>,
+    a: Rc<IndexMap<AttrValue, AttributeOrProperty>>,
+    b: Rc<IndexMap<AttrValue, AttributeOrProperty>>,
 ) -> Attributes {
     let mut merged = IndexMap::new();
-    merged.extend(a);
-    merged.extend(b);
+    merged.extend((*a).clone());
+    merged.extend((*b).clone());
 
-    Attributes::IndexMap(merged)
+    Attributes::IndexMap(Rc::new(merged))
 }
 
 fn merge_listeners(a: Listeners, b: Listeners) -> Listeners {
