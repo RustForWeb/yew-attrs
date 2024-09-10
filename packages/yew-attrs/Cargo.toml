@@ -9,7 +9,6 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-implicit-clone = "0.5.0"
 indexmap = "2.4.0"
 thiserror = "1.0.63"
 yew.workspace = true

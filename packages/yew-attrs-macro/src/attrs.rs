@@ -170,7 +170,7 @@ impl ToTokens for Attrs {
             quote! {
                 ::yew::virtual_dom::Attributes::IndexMap(
                     ::std::rc::Rc::new([
-                        #((::implicit_clone::unsync::IString::from(#keys), #values.unwrap())),*
+                        #((::yew::virtual_dom::AttrValue::from(#keys), #values.unwrap())),*
                     ].into())
                 )
             }
