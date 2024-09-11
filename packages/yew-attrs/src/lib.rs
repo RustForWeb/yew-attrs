@@ -137,6 +137,32 @@ impl Default for Attrs {
     }
 }
 
+impl From<VTag> for Attrs {
+    fn from(tag: VTag) -> Self {
+        Self::new(
+            match &tag.attributes {
+                Attributes::Static(attributes) => Attributes::IndexMap(Rc::new(
+                    attributes
+                        .iter()
+                        .map(|(key, value)| (AttrValue::from(*key), (*value).clone()))
+                        .collect(),
+                )),
+                Attributes::Dynamic { keys, values } => Attributes::IndexMap(Rc::new(
+                    keys.iter()
+                        .map(|key| AttrValue::from(*key))
+                        .zip(values.into_iter().filter_map(|value| value.clone()))
+                        .collect(),
+                )),
+                Attributes::IndexMap(attributes) => Attributes::IndexMap(attributes.clone()),
+            },
+            tag.value().cloned(),
+            tag.checked(),
+            // TODO: extract listeners from tag
+            Listeners::None,
+        )
+    }
+}
+
 fn merge_attributes(a: Attributes, b: Attributes) -> Result<Attributes, AttrsError> {
     match (a, b) {
         (Attributes::IndexMap(a), Attributes::IndexMap(b)) => Ok(merge_index_map_attributes(a, b)),
