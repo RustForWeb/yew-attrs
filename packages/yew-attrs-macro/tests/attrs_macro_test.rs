@@ -17,6 +17,13 @@ fn attrs_macro() {
 }
 
 #[test]
+fn attrs_empty() {
+    let attrs = attrs! {};
+
+    assert_eq!(Attrs::default(), attrs);
+}
+
+#[test]
 fn attrs_static() {
     let attrs = attrs! {
         class="text-red"

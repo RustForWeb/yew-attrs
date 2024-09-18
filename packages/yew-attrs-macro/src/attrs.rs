@@ -169,9 +169,16 @@ impl ToTokens for Attrs {
 
             quote! {
                 ::yew::virtual_dom::Attributes::IndexMap(
-                    ::std::rc::Rc::new([
-                        #((::yew::virtual_dom::AttrValue::from(#keys), #values.unwrap())),*
-                    ].into())
+                    ::std::rc::Rc::new(
+                        [
+                            #((::yew::virtual_dom::AttrValue::from(#keys), #values)),*
+                        ]
+                        .into_iter()
+                        .filter_map(|(key, value): (::yew::virtual_dom::AttrValue, ::std::option::Option<::yew::virtual_dom::AttributeOrProperty>)| {
+                            value.map(|value| (key, value))
+                        })
+                        .collect()
+                    )
                 )
             }
         };
