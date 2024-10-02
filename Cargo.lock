@@ -1409,7 +1409,7 @@ dependencies = [
 [[package]]
 name = "yew"
 version = "0.21.0"
-source = "git+https://github.com/RustForWeb/yew.git?branch=feature/set-noderef#d083707787ab75a7d5891539fc01e9f75a65cc21"
+source = "git+https://github.com/RustForWeb/yew.git?branch=feature/use-composed-ref#7ffa523679ea9ed366f554018f449be5df43e336"
 dependencies = [
  "base64ct",
  "bincode",
@@ -1462,7 +1462,7 @@ dependencies = [
 [[package]]
 name = "yew-macro"
 version = "0.21.0"
-source = "git+https://github.com/RustForWeb/yew.git?branch=feature/set-noderef#d083707787ab75a7d5891539fc01e9f75a65cc21"
+source = "git+https://github.com/RustForWeb/yew.git?branch=feature/use-composed-ref#7ffa523679ea9ed366f554018f449be5df43e336"
 dependencies = [
  "once_cell",
  "prettyplease",
