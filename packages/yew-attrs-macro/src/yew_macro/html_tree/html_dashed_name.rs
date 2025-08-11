@@ -59,10 +59,6 @@ impl Stringify for HtmlDashedName {
     fn try_into_lit(&self) -> Option<LitStr> {
         Some(self.to_lit_str())
     }
-
-    fn stringify(&self) -> TokenStream {
-        self.to_lit_str().stringify()
-    }
 }
 
 impl From<Ident> for HtmlDashedName {

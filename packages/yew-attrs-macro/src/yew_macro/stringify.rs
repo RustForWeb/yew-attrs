@@ -1,16 +1,8 @@
 // Copied from https://github.com/yewstack/yew/blob/yew-v0.21.0/packages/yew-macro/src/stringify.rs.
 
-use proc_macro2::{Span, TokenStream};
-use quote::{quote_spanned, ToTokens};
-use syn::spanned::Spanned;
+use proc_macro2::TokenStream;
+use quote::ToTokens;
 use syn::{Expr, Lit, LitStr};
-
-/// Stringify a value at runtime.
-fn stringify_at_runtime(src: impl ToTokens) -> TokenStream {
-    quote_spanned! {src.span().resolved_at(Span::call_site())=>
-        ::std::convert::Into::<::yew::virtual_dom::AttrValue>::into(#src)
-    }
-}
 
 /// Create `AttrValue` construction calls.
 ///
@@ -18,8 +10,6 @@ fn stringify_at_runtime(src: impl ToTokens) -> TokenStream {
 pub trait Stringify {
     /// Try to turn the value into a string literal.
     fn try_into_lit(&self) -> Option<LitStr>;
-    /// Create `AttrValue` however possible.
-    fn stringify(&self) -> TokenStream;
 
     /// Like `optimize_literals` but tags static or dynamic strings with [Value]
     fn optimize_literals_tagged(&self) -> Value
@@ -33,13 +23,10 @@ pub trait Stringify {
         }
     }
 }
+
 impl<T: Stringify + ?Sized> Stringify for &T {
     fn try_into_lit(&self) -> Option<LitStr> {
         (*self).try_into_lit()
-    }
-
-    fn stringify(&self) -> TokenStream {
-        (*self).stringify()
     }
 }
 
@@ -62,13 +49,8 @@ impl Stringify for LitStr {
     fn try_into_lit(&self) -> Option<LitStr> {
         Some(self.clone())
     }
-
-    fn stringify(&self) -> TokenStream {
-        quote_spanned! {self.span()=>
-            ::yew::virtual_dom::AttrValue::Static(#self)
-        }
-    }
 }
+
 impl Stringify for Lit {
     fn try_into_lit(&self) -> Option<LitStr> {
         let s = match self {
@@ -81,14 +63,8 @@ impl Stringify for Lit {
         };
         Some(LitStr::new(&s, self.span()))
     }
-
-    fn stringify(&self) -> TokenStream {
-        self.try_into_lit()
-            .as_ref()
-            .map(Stringify::stringify)
-            .unwrap_or_else(|| stringify_at_runtime(self))
-    }
 }
+
 impl Stringify for Expr {
     fn try_into_lit(&self) -> Option<LitStr> {
         if let Expr::Lit(v) = self {
@@ -96,12 +72,5 @@ impl Stringify for Expr {
         } else {
             None
         }
-    }
-
-    fn stringify(&self) -> TokenStream {
-        self.try_into_lit()
-            .as_ref()
-            .map(Stringify::stringify)
-            .unwrap_or_else(|| stringify_at_runtime(self))
     }
 }
