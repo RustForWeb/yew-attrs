@@ -42,6 +42,7 @@ async fn attrs_component() {
     let renderer = ServerRenderer::<App>::new();
     let rendered = renderer.render().await;
 
+    #[cfg(debug_assertions)]
     assert_eq!(
         "<!--<[attrs_component_test::App]>-->\
         <!--<[attrs_component_test::Button]>-->\
@@ -49,5 +50,15 @@ async fn attrs_component() {
         <!--</[attrs_component_test::Button]>-->\
         <!--</[attrs_component_test::App]>-->",
         rendered
-    )
+    );
+
+    #[cfg(not(debug_assertions))]
+    assert_eq!(
+        "<!--<[]>-->\
+        <!--<[]>-->\
+        <button class=\"text-red\">Click</button>\
+        <!--</[]>-->\
+        <!--</[]>-->",
+        rendered
+    );
 }
