@@ -12,7 +12,7 @@ multiple-versions = "allow"
 wildcards = "deny"
 
 [licenses]
-allow = ["Apache-2.0", "BSL-1.0", "MIT", "Zlib", "Unicode-DFS-2016"]
+allow = ["Apache-2.0", "BSL-1.0", "MIT", "Zlib", "Unicode-3.0"]
 confidence-threshold = 1.0
 
 [sources]
