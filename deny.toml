@@ -4,6 +4,7 @@ all-features = true
 [advisories]
 ignore = [
     { id = "RUSTSEC-2024-0370", reason = "No safe upgrade is available `proc-macro-error`." },
+    { id = "RUSTSEC-2025-0141", reason = "No maintained version available for `bincode`." },
 ]
 
 [bans]
@@ -12,7 +13,7 @@ multiple-versions = "allow"
 wildcards = "deny"
 
 [licenses]
-allow = ["Apache-2.0", "BSL-1.0", "MIT", "Zlib", "Unicode-3.0"]
+allow = ["Apache-2.0", "BSL-1.0", "MIT", "Unicode-3.0"]
 confidence-threshold = 1.0
 
 [sources]
