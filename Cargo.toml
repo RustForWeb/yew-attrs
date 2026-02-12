@@ -10,4 +10,4 @@ repository = "https://github.com/RustForWeb/yew-attrs"
 version = "0.2.4"
 
 [workspace.dependencies]
-yew = "0.21.0"
+yew = "0.22.0"
